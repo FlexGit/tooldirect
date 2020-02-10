@@ -1,0 +1,208 @@
+<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/bootstrap.min.css");?>
+    <?$APPLICATION->ShowHead();?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/tooltipster.bundle.min.css");?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/tooltipster-sideTip-borderless.min.css");?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/slick.css");?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/video-js.css");?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/lightgallery.css");?>
+	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/ion.rangeSlider.css");?>
+	<script src="<?=SITE_TEMPLATE_PATH?>/js/fontawesome.js"></script>
+	<title><?$APPLICATION->ShowTitle()?></title>
+</head>
+<body>
+    <div id="panel"><?$APPLICATION->ShowPanel();?></div>
+    <?$APPLICATION->IncludeComponent(
+        "bitrix:menu", 
+        "top-main-menu", 
+        array(
+            "ALLOW_MULTI_SELECT" => "N",
+            "CHILD_MENU_TYPE" => "left",
+            "DELAY" => "N",
+            "MAX_LEVEL" => "1",
+            "MENU_CACHE_GET_VARS" => array(
+            ),
+            "MENU_CACHE_TIME" => "3600",
+            "MENU_CACHE_TYPE" => "N",
+            "MENU_CACHE_USE_GROUPS" => "Y",
+            "ROOT_MENU_TYPE" => "topmain",
+            "USE_EXT" => "N",
+            "COMPONENT_TEMPLATE" => "top-main-menu"
+        ),
+        false
+    );?>
+    <div class="header">
+        <div class="container">
+            <div class="header__row">
+                <a href="/" class="header__logo">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/images/logo.svg" alt="" class="header__logo-img">
+                </a>
+                <form action="/search/" class="header__search">
+                    <input type="text" name="q" value="<?=$_REQUEST['q']?>" class="header__search-input" placeholder="Поиск товара: Циркулярная погружная пила">
+                    <input type="submit" class="header__search-submit" value="">
+                </form> <!-- search -->
+                <a href="mailto:info@tooldirect.ru" class="header__contact header__contact--email">
+                    <span>info@tooldirect.ru</span>
+                    <span>пишите мы на связи</span>
+                </a>
+                <a href="tel:74959844155" class="header__contact header__contact--tel">
+                    <span>+7 (495) 984-41-55</span>
+                    <span>Пн-Пт: 9:00 — 19:00</span>
+                </a>
+				<?$APPLICATION->IncludeComponent("bitrix:sale.basket.basket.line","",Array(
+						"HIDE_ON_BASKET_PAGES" => "N",
+						"PATH_TO_BASKET" => SITE_DIR."personal/cart/",
+						"PATH_TO_ORDER" => SITE_DIR."personal/order/make/",
+						"PATH_TO_PERSONAL" => SITE_DIR."personal/",
+						"PATH_TO_PROFILE" => SITE_DIR."personal/",
+						"PATH_TO_REGISTER" => SITE_DIR."login/",
+						"POSITION_FIXED" => "N",
+						"POSITION_HORIZONTAL" => "right",
+						"POSITION_VERTICAL" => "top",
+						"SHOW_AUTHOR" => "N",
+						"SHOW_DELAY" => "N",
+						"SHOW_EMPTY_VALUES" => "N",
+						"SHOW_IMAGE" => "N",
+						"SHOW_NOTAVAIL" => "N",
+						"SHOW_NUM_PRODUCTS" => "Y",
+						"SHOW_PERSONAL_LINK" => "N",
+						"SHOW_PRICE" => "N",
+						"SHOW_PRODUCTS" => "N",
+						"SHOW_SUMMARY" => "N",
+						"SHOW_TOTAL_PRICE" => "Y"
+					)
+				);?>
+            </div> <!-- header__row -->
+        </div> <!-- container -->
+    </div> <!-- header -->
+    <div class="menu">
+        <div class="container">
+            <div class="menu__row">
+                <div class="menu__catalog">
+                    <a href="#" class="menu__catalog-hamb js-full-cat">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </a>
+                    <div class="menu__catalog-link js-full-cat">полный каталог</div>
+                </div> <!-- menu__catalog -->
+				<?$APPLICATION->IncludeComponent("bitrix:menu", "top-add-menu", Array(
+					"ALLOW_MULTI_SELECT" => "N",    // Разрешить несколько активных пунктов одновременно
+						"CHILD_MENU_TYPE" => "left",    // Тип меню для остальных уровней
+						"DELAY" => "N", // Откладывать выполнение шаблона меню
+						"MAX_LEVEL" => "1", // Уровень вложенности меню
+						"MENU_CACHE_GET_VARS" => "",    // Значимые переменные запроса
+						"MENU_CACHE_TIME" => "3600",    // Время кеширования (сек.)
+						"MENU_CACHE_TYPE" => "N",   // Тип кеширования
+						"MENU_CACHE_USE_GROUPS" => "Y", // Учитывать права доступа
+						"ROOT_MENU_TYPE" => "topadd",  // Тип меню для первого уровня
+						"USE_EXT" => "N",   // Подключать файлы с именами вида .тип_меню.menu_ext.php
+						"COMPONENT_TEMPLATE" => "top-main-menu"
+					),
+					false
+				);?>
+            </div> <!-- menu__row -->
+        </div> <!-- container -->
+    </div> <!-- menu -->
+    <div class="mheader">
+        <div class="container">
+            <div class="mheader__row">
+                <div class="mheader__menu-btn js-mheader-menu-btn">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/images/hamb.svg" alt="">
+                </div>
+                <form action="#" class="mheader__search">
+                    <input type="text" class="mheader__input" placeholder="Искать по сайту">
+                    <input type="submit" class="mheader__submit" value="">
+                </form>
+                <a href="#" class="mheader__basket">
+                    <img src="<?=SITE_TEMPLATE_PATH?>/images/mobile-basket.svg" alt="">
+                </a>
+            </div> <!-- mheader__row -->
+        </div> <!-- container -->
+		<?$APPLICATION->IncludeComponent("bitrix:menu", "main-menu-mobile", Array(
+				"ALLOW_MULTI_SELECT" => "N",    // Разрешить несколько активных пунктов одновременно
+				"CHILD_MENU_TYPE" => "left",    // Тип меню для остальных уровней
+				"DELAY" => "N", // Откладывать выполнение шаблона меню
+				"MAX_LEVEL" => "1", // Уровень вложенности меню
+				"MENU_CACHE_GET_VARS" => "",    // Значимые переменные запроса
+				"MENU_CACHE_TIME" => "3600",    // Время кеширования (сек.)
+				"MENU_CACHE_TYPE" => "N",   // Тип кеширования
+				"MENU_CACHE_USE_GROUPS" => "Y", // Учитывать права доступа
+				"ROOT_MENU_TYPE" => "topmain",  // Тип меню для первого уровня
+				"USE_EXT" => "N",   // Подключать файлы с именами вида .тип_меню.menu_ext.php
+				"COMPONENT_TEMPLATE" => "top-main-menu"
+			),
+			false
+		);?>
+    </div> <!-- mheader -->
+    <div class="fullcat">
+        <div class="container">
+            <div class="fullcat__btn js-full-cat">полный каталог</div>
+        </div> <!-- container -->
+    </div> <!-- fullcat -->
+    <div class="catmenu js-catmenu">
+        <div class="container">
+            <div class="catmenu__box">
+                <div class="catmenu__items">
+					<?
+					global $arrFilterSectionMain;
+					$arrFilterSectionMain = Array(
+						"=UF_SEO_SECTION" => false,
+						"=UF_USER_SECTION" => false,
+						"=UF_USER_EXT_SECTION" => false,
+					);
+					?>
+					<?$APPLICATION->IncludeComponent(
+						"bitrix:catalog.section.list","menu", Array(
+							"SHOW_PARENT_NAME" => "Y",
+							"IBLOCK_TYPE" => "catalog",
+							"IBLOCK_ID" => CATALOG_BLOCK_ID,
+							"SECTION_ID" => "",
+							"SECTION_CODE" => "",
+							"SECTION_URL" => "",
+							"COUNT_ELEMENTS" => "Y",
+							"TOP_DEPTH" => "1",
+							"SECTION_FIELDS" => "",
+							"SECTION_USER_FIELDS" => Array('UF_*'),
+							"USE_FILTER" => "Y",
+							"FILTER_NAME" => "arrFilterSectionMain",
+							"ADD_SECTIONS_CHAIN" => "Y",
+							"CACHE_TYPE" => "A",
+							"CACHE_TIME" => "36000000",
+							"CACHE_NOTES" => "",
+							"CACHE_GROUPS" => "Y"
+						)
+					);?>
+                </div> <!-- catmenu__items -->
+            </div> <!-- catmenu__box -->
+        </div> <!-- container -->
+    </div> <!-- catmenu -->
+
+<?$APPLICATION->IncludeComponent("bitrix:breadcrumb","",Array(
+		"START_FROM" => "0",
+		"PATH" => "",
+		"SITE_ID" => "s1"
+	)
+);?>

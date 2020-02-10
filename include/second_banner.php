@@ -1,0 +1,1 @@
+<div class="banners__banner banners__banner--second" style="background-image: url(/images/banner2.png);"></div>
