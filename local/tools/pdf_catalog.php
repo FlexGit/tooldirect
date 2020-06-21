@@ -171,6 +171,7 @@ $mpdf = new \Mpdf\Mpdf([
 ]);
 $mpdf->SetTitle('PDF-Catalog');
 $mpdf->SetAuthor('Tooldirect');
+$mpdf->shrink_tables_to_fit = 1.4;
 
 $html = '
 <style>
@@ -290,10 +291,10 @@ if (!empty($arResult['SECTIONS'])) {
 				
 				//$html .= $sectionValue['ELEMENTS_CNT'].' - '.$firstColumnElementsCount . ' - ' . $secondColumnElementsCount;
 				
-				$html .= '<table><tr><td style="width: 49%;">';
+				//$html .= '<table><tr><td style="width: 49%;" autosize="1.6">';
 				
 				if ($firstColumnElementsCount) {
-					$html .= '<table class="elements">';
+					$html .= '<table class="elements" autosize="1.6">';
 					if (!empty($sectionValue['ELEMENTS'])) {
 						$html .= '
 					<tr>
@@ -336,12 +337,12 @@ if (!empty($arResult['SECTIONS'])) {
 					$html .= '</table>';
 				}
 				
-				$html .= '</td>';
-				$html .= '<td style="width: 2%;"></td>';
-				$html .= '<td style="width: 49%;">';
+				//$html .= '</td>';
+				//$html .= '<td style="width: 2%;"></td>';
+				//$html .= '<td style="width: 49%;">';
 				
 				if ($secondColumnElementsCount) {
-					$html .= '<table class="elements">';
+					$html .= '<table class="elements" autosize="1.6">';
 					if (!empty($sectionValue['ELEMENTS'])) {
 						$html .= '
 					<tr>
@@ -386,7 +387,7 @@ if (!empty($arResult['SECTIONS'])) {
 					$html .= '</table>';
 				}
 				
-				$html .= '</td></tr></table>';
+				//$html .= '</td></tr></table>';
 			break;
 			case 'extended':
 			break;
