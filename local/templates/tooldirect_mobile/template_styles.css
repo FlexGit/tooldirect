@@ -2027,6 +2027,14 @@ a.link:hover {
   /*border-bottom: 1px solid #369e37;*/
   /*text-decoration: underline;*/
 }
+a.link_green {
+  color: #369e37;
+  text-decoration: none;
+  border-bottom: 1px solid #369e37;
+}
+a.link_green:hover {
+  border-bottom: none;
+}
 
 .textbetween {
   justify-content: space-between;
@@ -2368,4 +2376,27 @@ input[name="quantity"] {
   font-size: 20px;
   margin: 20px 0 10px;
   cursor: pointer;
+}
+.section-sorting {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 14px;
+  margin: 20px 0;
+}
+.section-sorting span {
+  margin-right: 10px;
+}
+.section-sorting a {
+  margin-right: 10px;
+  color: #3CAA37;
+}
+.section-sorting a:hover {
+  color: #212529;
+}
+.section-preloader {
+  width: 100%;
+}
+.section-preloader img {
+  display: block;
+  margin: 0 auto;
 }

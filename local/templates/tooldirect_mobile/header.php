@@ -32,6 +32,7 @@
 	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/video-js.css");?>
 	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/lightgallery.css");?>
 	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/ion.rangeSlider.css");?>
+	<?$APPLICATION->SetAdditionalCSS("/bitrix/css/main/font-awesome.css");?>
     <title><?$APPLICATION->ShowTitle()?></title>
 	<!-- Facebook Pixel Code -->
 	<script>

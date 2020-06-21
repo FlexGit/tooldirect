@@ -19,7 +19,7 @@ $arWaterMark = Array(
 		"position" => "center",
 		"size" => "big",
 		"type" => "image",
-		"alpha_level" => "50",
+		"alpha_level" => "90",
 		"file" => $_SERVER['DOCUMENT_ROOT']."/images/watermark.png",
 	)
 );
@@ -101,5 +101,45 @@ class ProductClass {
 				}
 			}
 		}
+	}
+}
+
+AddEventHandler('main', 'OnAdminContextMenuShow', 'LinksDetailAdminContextMenuShow');
+function LinksDetailAdminContextMenuShow(&$items) {
+	if ($_SERVER['REQUEST_METHOD'] == 'GET' && $GLOBALS['APPLICATION']->GetCurPage() == '/bitrix/admin/iblock_element_edit.php' && $_REQUEST['ID'] > 0 && $_REQUEST['IBLOCK_ID'] == 23) {
+		$items[] = [
+			"TEXT" => "Анализ", // название
+			"LINK" => "javascript:if(confirm('Вы уверены?'))analysis_links(".$_REQUEST['ID'].")", // ссылка
+			"TITLE" => "Анализ", // подпись
+			"ICON" => "adm-btn" // картинка
+		];
+		$items[] = [
+			"TEXT" => "Перелинковка", // название
+			"LINK" => "javascript:if(confirm('Вы уверены?'))set_links(".$_REQUEST['ID'].")", // ссылка
+			"TITLE" => "Перелинковка", // подпись
+			"ICON" => "adm-btn" // картинка
+		];
+		$items[] = [
+			"TEXT" => "Удалить все ссылки", // название
+			"LINK" => "javascript:if(confirm('Вы уверены?'))delete_links(".$_REQUEST['ID'].")", // ссылка
+			"TITLE" => "Удалить все ссылки", // подпись
+			"ICON" => "adm-btn" // картинка
+		];
+	}
+}
+
+AddEventHandler("main", "OnEpilog", "error_page");
+function error_page()
+{
+	$page_404 = "/404.php";
+	GLOBAL $APPLICATION;
+	if(strpos($APPLICATION->GetCurPage(), $page_404) === false && defined("ERROR_404") && ERROR_404 == "Y")
+	{
+		$APPLICATION->RestartBuffer();
+		CHTTP::SetStatus("404 Not Found");
+		include($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/header.php");
+		include($_SERVER["DOCUMENT_ROOT"].$page_404);
+		include($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/footer.php");
+		die();
 	}
 }

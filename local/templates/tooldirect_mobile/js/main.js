@@ -1,6 +1,9 @@
 $(function() {
 	$('input[type="tel"]').mask('+7(000)000-00-00', {placeholder: "+7(___)___-__-__"});
 
+	var sectionSortBy = localStorage.getItem('sectionSortBy');
+	var sectionSortType = localStorage.getItem('sectionSortType');
+
 	$('.js-product-menu-item').on('click', function() {
 		$this = $(this);
 		var $row = $this.closest('.product__row');
@@ -492,6 +495,41 @@ $(function() {
 		$(this).next('p').slideToggle();
 	});
 
+	$body.on('click', '.js-section-sort', function() {
+		$this = $(this);
+
+		localStorage.setItem('sectionSortBy', $this.data('sort-by'));
+
+		if (sectionSortType) {
+			if (sectionSortBy === $this.data('sort-by')) {
+				if (sectionSortType === 'asc')
+					localStorage.setItem('sectionSortType', 'desc');
+				else
+					localStorage.setItem('sectionSortType', 'asc');
+			} else {
+				localStorage.setItem('sectionSortType', 'asc');
+			}
+		} else {
+			localStorage.setItem('sectionSortType', 'asc');
+		}
+
+		sectionSortBy = localStorage.getItem('sectionSortBy');
+		sectionSortType = localStorage.getItem('sectionSortType');
+
+		//console.log(sectionSortBy + ' - ' + sectionSortType);
+
+		$('.js-section-sort').each(function(){
+			if ($(this).data('sort-by') === sectionSortBy) {
+				$(this).find('.fa').addClass('hidden');
+				$(this).find('.sort-'+sectionSortType).removeClass('hidden');
+			} else {
+				$(this).find('.fa').addClass('hidden');
+			}
+		});
+
+		sectionOutput();
+	});
+
 	var myMap;
 	ymaps.ready(init);
 
@@ -605,6 +643,8 @@ $(function() {
 	});
 
 	function sectionOutput() {
+		$('.section-preloader').removeClass('hidden');
+
 		var $section_id = $('#section_id').val();
 
 		var dataAttr = [];
@@ -620,11 +660,18 @@ $(function() {
 
 		//console.log(dataAttr);
 
+		sectionSortBy = localStorage.getItem('sectionSortBy');
+		sectionSortType = localStorage.getItem('sectionSortType');
+
 		var data = {
 			"section_id": $section_id,
-			"dataAttr": dataAttr
+			"dataAttr": dataAttr,
+			"sortBy": sectionSortBy,
+			"sortType": sectionSortType
 		};
+
 		//console.log(data);
+
 		$.ajax({
 			url: '/local/ajax/section.php',
 			type: 'POST',
@@ -634,6 +681,9 @@ $(function() {
 			async: true,
 			success: function (response) {
 				//console.log(response);
+
+				$('.section-preloader').addClass('hidden');
+
 				$('#section').html(response);
 			},
 			error: function(jqXhr, textStatus, errorThrown) {

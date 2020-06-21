@@ -4,7 +4,7 @@ CModule::IncludeModule("iblock");
 CModule::IncludeModule("catalog");
 
 $IBLOCK_ID = 4;
-$FILE = 'names2.xlsx';
+$FILE = 'short_names.xlsx';
 
 $translitParams = [
 	"max_len" => "250", // обрезает символьный код до 100 символов
@@ -50,7 +50,7 @@ if (CModule::IncludeModule("nkhost.phpexcel")) {
 	foreach ($arProducts as $products => $product) {
 		$product[0] = trim($product[0]);
 
-		//if ($product[0] == 'ACS001') {
+		//if ($product[0] == 'LC30200030') {
 			//echo '<pre>';print_r($product);echo '<pre>';
 			$v1 = utf8_encode($product[1]);
 			$v2 = iconv("cp1251", "utf8", $product[1]);
@@ -77,23 +77,7 @@ if (CModule::IncludeModule("nkhost.phpexcel")) {
 			$res = CIBlockElement::GetList([], $arFilter, false, false, ["ID", "IBLOCK_ID"]);
 			if ($ob = $res->GetNextElement()) {
 				$arFields = $ob->GetFields();
-				
-				// обновление элемента
-				$el = new CIBlockElement;
-				$arLoadProductArray = [
-					"MODIFIED_BY" => 1,
-					"IBLOCK_ID" => $IBLOCK_ID,
-					"NAME" => $name,
-					"CODE" => CUtil::translit($name, "ru", $translitParams),
-				];
-				
-				//print_r($arLoadProductArray);
-				
-				if ($el->Update($arFields["ID"], $arLoadProductArray)) {
-					echo 'Товар ID ' . $arFields["ID"] . ' обновлен, Артикул ' . $product[0] . '<br>';
-				} else {
-					echo 'Товар ID ' . $arFields["ID"] . ' не обновлен, Артикул ' . $product[0] . '<br>';
-				}
+				CIBlockElement::SetPropertyValueCode($arFields['ID'], "NAME_PDF", $name);
 			}
 		//}
 	}

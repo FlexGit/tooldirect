@@ -75,6 +75,13 @@ Disallow: /*PAGEN_5=
 Disallow: /*PAGEN_6=
 Disallow: /*PAGEN_7=
 Disallow: /*detail.php
+Disallow: /*SIZEN_1=
+Disallow: /*SIZEN_2=
+Disallow: /*SIZEN_3=
+Disallow: /*SIZEN_4=
+Disallow: /*SIZEN_5=
+Disallow: /*SIZEN_6=
+Disallow: /*SIZEN_7=
 
 User-agent: Screaming Frog SEO Spider
 Allow: /

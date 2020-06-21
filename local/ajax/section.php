@@ -6,6 +6,13 @@ CModule::IncludeModule("catalog");
 $sectionId = intval($_POST['section_id']);
 $dataAttr = $_POST['dataAttr'];
 
+$sortBy = 'PROPERTY_D';
+$sortType = 'asc';
+if (!empty($_POST['sortBy']) && !empty($_POST['sortType'])) {
+	$sortBy = $_POST['sortBy'];
+	$sortType = $_POST['sortType'];
+}
+
 if ($sectionId) {
 	global $arrFilterSectionMain;
 	if (!empty($dataAttr)) {
@@ -83,8 +90,8 @@ if ($sectionId) {
 			"DISPLAY_BOTTOM_PAGER" => "N",
 			"PAGER_SHOW_ALWAYS" => "N",
 			"PAGER_SHOW_ALL" => "N",
-			"ELEMENT_SORT_FIELD" => "PROPERTY_D",
-			"ELEMENT_SORT_ORDER" => "asc",
+			"ELEMENT_SORT_FIELD" => $sortBy,
+			"ELEMENT_SORT_ORDER" => $sortType,
 			"ELEMENT_SORT_FIELD2" => "name",
 			"ELEMENT_SORT_ORDER2" => "asc"
 	), false

@@ -17,3 +17,6 @@ if (CModule::IncludeModule("main")) {
 	//echo 'ok';
 	//}
 }
+
+if (mail('d1d1d1@inbox.ru','111','222'))
+	echo 'SUCCESS';

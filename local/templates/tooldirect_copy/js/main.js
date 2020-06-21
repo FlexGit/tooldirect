@@ -1,6 +1,18 @@
 $(function() {
 	$('input[type="tel"]').mask('+7(000)000-00-00', {placeholder: "+7(___)___-__-__"});
 
+	var sectionSortBy = localStorage.getItem('sectionSortBy');
+	var sectionSortType = localStorage.getItem('sectionSortType');
+
+	//console.log(sectionSortBy + ' - ' + sectionSortType);
+
+	/*if (sectionSortBy && sectionSortType) {
+		$('.js-section-sort').find('.fa').addClass('hidden');
+		$('.js-section-sort[data-sort-by="'+sectionSortBy+'"]').find('.sort-'+sectionSortType).removeClass('hidden');
+	}*/
+
+	//sectionOutput();
+
 	$(window).scroll(function () {
 		if ($(this).scrollTop() > 50) {
 			$('.back-to-top').fadeIn();
@@ -557,6 +569,41 @@ $(function() {
 		$(this).next('p').slideToggle();
 	});
 
+	$body.on('click', '.js-section-sort', function() {
+		$this = $(this);
+
+		localStorage.setItem('sectionSortBy', $this.data('sort-by'));
+
+		if (sectionSortType) {
+			if (sectionSortBy === $this.data('sort-by')) {
+				if (sectionSortType === 'asc')
+					localStorage.setItem('sectionSortType', 'desc');
+				else
+					localStorage.setItem('sectionSortType', 'asc');
+			} else {
+				localStorage.setItem('sectionSortType', 'asc');
+			}
+		} else {
+			localStorage.setItem('sectionSortType', 'asc');
+		}
+
+		sectionSortBy = localStorage.getItem('sectionSortBy');
+		sectionSortType = localStorage.getItem('sectionSortType');
+
+		//console.log(sectionSortBy + ' - ' + sectionSortType);
+
+		$('.js-section-sort').each(function(){
+			if ($(this).data('sort-by') === sectionSortBy) {
+				$(this).find('.fa').addClass('hidden');
+				$(this).find('.sort-'+sectionSortType).removeClass('hidden');
+			} else {
+				$(this).find('.fa').addClass('hidden');
+			}
+		});
+
+		sectionOutput();
+	});
+
 	var myMap;
 	ymaps.ready(init);
 
@@ -669,42 +716,96 @@ $(function() {
 		navigator.geolocation.getCurrentPosition(success, error, options);
 	});
 
+	$(document).on('click', '.js-pdf-catalog', function(){
+		var $form = $(this).closest('form');
+		var sections = [];
+		var makes = [];
+		var type = 'standart';
+		$form.find(':input').each(function(){
+			//console.log($(this).val());
+			if($(this).is(':checked')) {
+				if($(this).hasClass('pdf-section')){
+					sections.push($(this).val());
+				}else if($(this).hasClass('pdf-make')) {
+					makes.push($(this).val());
+				}else if($(this).hasClass('pdf-type')) {
+					type = $(this).val();
+				}
+			}
+		});
+
+		if(!sections.length || !makes.length) {
+			alert('Выберите разделы и производителей для формирования PDF-каталога');
+			return;
+		}
+
+		var url = '/pdf-catalog/?sections=' + sections + '&makes=' + makes + '&type=' + type;
+		console.log(url);
+
+		var win = window.open(url, '_blank');
+		if(win){
+			win.focus();
+		}
+	});
 
 	function sectionOutput() {
-	var $section_id = $('#section_id').val();
+		$('.section-preloader').removeClass('hidden');
 
-	var dataAttr = [];
-	$('.js-smartfilter').each(function() {
-		if ($(this).find('.icon-cross').is(':visible')) {
-			var data = $(this).data();
-			data.value_from = parseInt($(this).attr('data-value_from'));
-			data.value_to = parseInt($(this).attr('data-value_to'));
-			//console.log(data);
-			dataAttr.push(data);
-		}
-	});
+		var $section_id = $('#section_id').val();
 
-	//console.log(dataAttr);
+		var dataAttr = [];
+		$('.js-smartfilter').each(function() {
+			if ($(this).find('.icon-cross').is(':visible')) {
+				var data = $(this).data();
+				data.value_from = parseInt($(this).attr('data-value_from'));
+				data.value_to = parseInt($(this).attr('data-value_to'));
+				//console.log(data);
+				dataAttr.push(data);
+			}
+		});
 
-	var data = {
-		"section_id": $section_id,
-		"dataAttr": dataAttr
-	};
-	//console.log(data);
-	$.ajax({
-		url: '/local/ajax/section.php',
-		type: 'POST',
-		data: data,
-		dataType: 'html',
-		cache: false,
-		async: true,
-		success: function (response) {
-			//console.log(response);
-			$('#section').html(response);
-		},
-		error: function(jqXhr, textStatus, errorThrown) {
-			console.log(errorThrown);
-		}
-	});
-}
+		//console.log(dataAttr);
+
+		sectionSortBy = localStorage.getItem('sectionSortBy');
+		sectionSortType = localStorage.getItem('sectionSortType');
+
+		var data = {
+			"section_id": $section_id,
+			"dataAttr": dataAttr,
+			"sortBy": sectionSortBy,
+			"sortType": sectionSortType
+		};
+
+		//console.log(data);
+
+		$.ajax({
+			url: '/local/ajax/section.php',
+			type: 'POST',
+			data: data,
+			dataType: 'html',
+			cache: false,
+			async: true,
+			success: function (response) {
+				//console.log(response);
+
+				$('.section-preloader').addClass('hidden');
+
+				$('#section').html(response);
+
+				/*console.log(sectionSortBy + ' - ' + sectionSortType);
+
+				$('.js-section-sort').each(function(){
+					if ($(this).data('sort-by') === sectionSortBy) {
+						//$(this).find('.fa').addClass('hidden');
+						$(this).find('.sort-'+sectionSortType).removeClass('hidden');
+					} else {
+						$(this).find('.fa').addClass('hidden');
+					}
+				});*/
+			},
+			error: function(jqXhr, textStatus, errorThrown) {
+				console.log(errorThrown);
+			}
+		});
+	}
 });

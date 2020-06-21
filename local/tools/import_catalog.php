@@ -39,7 +39,7 @@ $translitParams = [
 	"use_google" => "false", // отключаем использование google
 ];
 
-exit;
+//exit;
 
 if (CModule::IncludeModule("nkhost.phpexcel")) {
 	global $PHPEXCELPATH;

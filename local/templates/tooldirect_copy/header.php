@@ -23,6 +23,12 @@
 	<meta name="theme-color" content="#ffffff">
 	<meta name="google-site-verification" content="Xuzu5AgI06IRJRZquroM00hmBMDWw816C3PqQ-taidY" />
 	<meta name="yandex-verification" content="92c6466831680e9c" />
+	<meta property="og:image" content="<?=$APPLICATION->ShowProperty("og:image:tag")?>" />
+	<meta property="og:image:width" content="<?=$APPLICATION->ShowProperty("og:image:width")?>" />
+	<meta property="og:image:height" content="<?=$APPLICATION->ShowProperty("og:image:height")?>" />
+	<meta property="og:image:alt" content="<?=$APPLICATION->ShowProperty("og:image:alt")?>" />
+	<meta property="og:locale" content="ru_RU">
+	<meta property="fb:app_id" content="258341798482082" />
 	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/bootstrap.min.css");?>
     <?$APPLICATION->ShowHead();?>
 	<?$APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH."/css/tooltipster.bundle.min.css");?>

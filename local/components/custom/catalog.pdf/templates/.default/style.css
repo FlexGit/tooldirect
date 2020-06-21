@@ -1,0 +1,15 @@
+.pdf-catalog-container {
+	display: flex;
+}
+.pdf-catalog-column {
+	padding: 20px;
+}
+.pdf-catalog-column h4 {
+	margin-bottom: 20px;
+}
+#pdf_catalog_params a.product__menu-button {
+	text-align: center;
+}
+#pdf_catalog_params a.product__menu-button span {
+	color: #fff;
+}

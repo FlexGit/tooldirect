@@ -107,6 +107,7 @@ $RN = [
 	'Верхний рез' => 123,
 	'Нижний рез' => 124,
 	'Двунаправленный рез' => 125,
+	'Прямой рез' => 140,
 ];
 
 $TEETH_TYPE = [
@@ -263,7 +264,7 @@ class Viewapp {
 					
 					if (!$inspectionParams['PartNum']) continue;
 					
-					echo 'Схема осмотра: ' . $v['service_name'] . ', ID раздела: ' . $schemes[$v['service_name']] . '<br>';
+					//echo 'Схема осмотра: ' . $v['service_name'] . ', ID раздела: ' . $schemes[$v['service_name']] . '<br>';
 					
 					$el = new CIBlockElement;
 					$arLoadProductArray = [
@@ -404,16 +405,28 @@ class Viewapp {
 						}
 						$arLoadProductArray["NAME"] = $arFields['NAME'] . ', арт. ' . $PROP['ARTICLE'];*/
 						//echo 'Название для сайта: ' . $arLoadProductArray["NAME"].'<br>';
-						$arLoadProductArray["CODE"] = /*CUtil::translit($arLoadProductArray["NAME"], "ru", $translitParams)*/$this->str2url($arFields["NAME"]);
-						$arLoadProductArray["PROPERTY_VALUES"] = $PROP;
+						//$arLoadProductArray["CODE"] = /*CUtil::translit($arLoadProductArray["NAME"], "ru", $translitParams)*/$this->str2url($arFields["NAME"]);
 						
-						echo 'Артикул: ' . $PROP['ARTICLE'] . '<br>';
-						echo '<pre>';
-						print_r($arLoadProductArray);
-						echo '</pre>';
+						//$arLoadProductArray["PROPERTY_VALUES"] = $PROP; // комментриуем, чтобы не обновлялись св-ва, которые есть только на сайте
+						
+						//echo 'Артикул: ' . $PROP['ARTICLE'] . '<br>';
+						//echo '<pre>';
+						//print_r($arLoadProductArray);
+						//echo '</pre>';
 						
 						if ($res = $el->Update($elId, $arLoadProductArray)) {
 							echo 'UPDATE: Товар ID ' . $elId . ' обновлен, Артикул ' . $inspectionParams['PartNum'] . '<br><br>';
+							if (!empty($PROP)) {
+								foreach ($PROP as $k_prop => $v_prop) {
+									if (in_array($k_prop, ['ARTICLE']))
+										continue;
+									if (CIBlockElement::SetPropertyValueCode($elId, $k_prop, $v_prop)) {
+										echo 'Свойство ' . $k_prop . ' успешно обновлено<br>';
+									} else {
+										echo 'Свойство ' . $k_prop . ' не обновлено<br><br>';
+									}
+								}
+							}
 						} else {
 							echo 'UPDATE: Товар ID ' . $elId . ' ошибка: ' . $el->LAST_ERROR . '<br><br>';
 						}
@@ -449,10 +462,10 @@ class Viewapp {
 						
 						$arLoadProductArray["PROPERTY_VALUES"] = $PROP;
 						
-						echo 'Артикул: ' . $PROP['ARTICLE'] . '<br>';
-						echo '<pre>';
-						print_r($arLoadProductArray);
-						echo '</pre>';
+						//echo 'Артикул: ' . $PROP['ARTICLE'] . '<br>';
+						//echo '<pre>';
+						//print_r($arLoadProductArray);
+						//echo '</pre>';
 						
 						if ($elId = $el->Add($arLoadProductArray)) {
 							echo 'ADD Товар ID ' . $elId . ' добавлен, Артикул ' . $inspectionParams['PartNum'] . '<br><br>';

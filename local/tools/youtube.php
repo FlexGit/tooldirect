@@ -20,7 +20,7 @@ $queryParams = [
 $responsePlaylists = $youtube->playlists->listPlaylists('snippet,contentDetails', $queryParams);
 
 /*echo '<pre>';
-print_r($response->items);
+print_r($responsePlaylists->items);
 echo '</pre>';*/
 
 if (!empty($responsePlaylists->items)) {
@@ -45,8 +45,23 @@ if (!empty($responsePlaylists->items)) {
 				if (!empty($itemVideos->snippet->description)) {
 					$videoArticles = explode(',', $itemVideos->snippet->description);
 				}
+				
+				/*echo '<pre>';
+				print_r($videoArticles);
+				echo '</pre>';*/
+				
 				$videoId = $itemVideos->contentDetails->videoId;
-				$videos[$videoId] = array_unique(array_merge($playlistArticles, $videoArticles));
+				
+				//echo $videoId;
+				
+				foreach ($playlistArticles as $k => $v) {
+					$videoArticles[] = $v;
+				}
+				$videos[$videoId] = array_unique($videoArticles);
+				
+				/*echo '<pre>';
+				print_r($videos);
+				echo '</pre>';*/
 			}
 		}
 	}
@@ -68,9 +83,9 @@ if (!empty($videos)) {
 	}
 }
 
-echo '<pre>';
+/*echo '<pre>';
 print_r($arr);
-echo '</pre>';
+echo '</pre>';*/
 
 if (!empty($arr)) {
 	foreach ($arr as $article => $videoId) {

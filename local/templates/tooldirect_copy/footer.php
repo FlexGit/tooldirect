@@ -176,6 +176,88 @@
 	<script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=6LdcebsUAAAAALa4RtfpreMkUDaU0gNjirKVUzoP'></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/js/main.js?v=<?=mktime()?>"></script>
 	<script>
+		$(function() {
+			function sectionOutput() {
+				$('.section-preloader').removeClass('hidden');
+
+				var $section_id = $('#section_id').val();
+
+				var dataAttr = [];
+				$('.js-smartfilter').each(function() {
+					if ($(this).find('.icon-cross').is(':visible')) {
+						var data = $(this).data();
+						data.value_from = parseInt($(this).attr('data-value_from'));
+						data.value_to = parseInt($(this).attr('data-value_to'));
+						//console.log(data);
+						dataAttr.push(data);
+					}
+				});
+
+				//console.log(dataAttr);
+
+				sectionSortBy = localStorage.getItem('sectionSortBy');
+				sectionSortType = localStorage.getItem('sectionSortType');
+
+				var data = {
+					"section_id": $section_id,
+					"dataAttr": dataAttr,
+					"sortBy": sectionSortBy,
+					"sortType": sectionSortType
+				};
+
+				//console.log(data);
+
+				$.ajax({
+					url: '/local/ajax/section.php',
+					type: 'POST',
+					data: data,
+					dataType: 'html',
+					cache: false,
+					async: true,
+					success: function (response) {
+						//console.log(response);
+
+						$('.section-preloader').addClass('hidden');
+						$('#section').html(response);
+					},
+					error: function(jqXhr, textStatus, errorThrown) {
+						console.log(errorThrown);
+					}
+				});
+			}
+			
+			<?
+			if (!empty($_GET)){
+				foreach ($_GET as $k => $v) {
+					$values = [];
+					?>
+					var smartfilter = $('.js-smartfilter[data-code="<?=$k?>"]');
+					if (!smartfilter.length) return true;
+					
+					var makesJs = smartfilter.data('checked');
+					console.log(makesJs);
+					
+					<?$makes = (array)$_GET['MAKE'];?>
+					var newMakesJs = {};
+					$.each(makesJs, function (index, value) {
+						newMakesJs[index] = 0;
+						<?foreach ($makes as $make) {?>
+						if (index === '<?=$make?>') {
+							newMakesJs[index] = 1;
+						}
+						<?}?>
+					});
+					console.log(newMakesJs);
+					smartfilter.data('checked', newMakesJs);
+					smartfilter.find('.icon-cross').css('display', 'inline-block');
+					sectionOutput();
+					<?
+				}
+			}
+			?>
+		});
+	</script>
+	<script>
 		function onloadCallback() {
 			grecaptcha.ready(function () {
 				grecaptcha.execute('<?=RECAPTCHA_SITE_KEY?>', {action: 'form'}).then(function (token) {
