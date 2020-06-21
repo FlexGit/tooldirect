@@ -82,6 +82,7 @@ Disallow: /*SIZEN_4=
 Disallow: /*SIZEN_5=
 Disallow: /*SIZEN_6=
 Disallow: /*SIZEN_7=
+Disallow: /pdf-catalog/
 
 User-agent: Screaming Frog SEO Spider
 Allow: /

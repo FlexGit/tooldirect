@@ -739,7 +739,7 @@ $(function() {
 			return;
 		}
 
-		var url = '/pdf-catalog/?sections=' + sections + '&makes=' + makes + '&type=' + type;
+		var url = '/local/tools/pdf_catalog.php?sections=' + sections + '&makes=' + makes + '&type=' + type;
 		console.log(url);
 
 		var win = window.open(url, '_blank');

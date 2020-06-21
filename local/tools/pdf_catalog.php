@@ -1,4 +1,12 @@
-<?php
+<?
+$sections = explode(',', $_REQUEST['sections']);
+$makes = explode(',', $_REQUEST['makes']);
+$type = $_REQUEST['type'];
+
+if (empty($sections) || empty($makes) || empty($type)) {
+	die();
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/lib/phpqrcode/qrlib.php';
 require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php');
@@ -10,376 +18,403 @@ CModule::IncludeModule('highloadblock');
 
 define("YOUTUBE_VIDEO_PATH", "https://www.youtube.com/watch?v=");
 
-$disabledProps = [
-	'NEW',
-	'MORE_PHOTO',
-	'PROMO',
-	'VIDEO',
-	'SHOW_MAIN',
-	'SHOW_MAIN_SUBSECTION',
-	'MATERIAL',
-	'YOUTUBE_VIDEO_ID',
-	'DRAWING',
-	'NAME_PDF',
-	'POPULAR',
-	//'COMPETITOR_ARTICLES',
-	'ANALOG_ARTICLES',
-	'RELATED_ARTICLES',
+$sectionParams = [
+	'7118' => [
+		'params' =>	['D','I','L','S','R','Z','CUTTING_TYPE','H'],
+		'type' => 'UF_USER_EXT_SECTION',
+	], // Фрезы концевые
+	'7235' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Фрезы алмазные
+	'7292' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Аксессуары
+	'7305' => [
+		'params' =>	['D','I','L','S','CUTTING_TYPE'],
+		'type' => 'UF_USER_SECTION',
+	], // Граверы
+	'7246' => [
+		'params' =>	['D','I','L','B','R','H','CUTTING_TYPE','Z'],
+		'type' => 'UF_USER_SECTION',
+	], // Фрезы насадные
+	'7310' => [
+		'params' =>	['LENGTH','WIDTH','HEIGHT','R','CUTTING_TYPE'],
+		'type' => 'UF_USER_SECTION',
+	], // Ножи и бланкеты
+	'7322' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Патроны и цанги
+	'7328' => [
+		'params' =>	['D','B','K','P','Z','TEETH_TYPE'],
+		'type' => 'UF_USER_SECTION',
+	], // Пильные диски
+	'7353' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Столярные приспособления
+	'7359' => [
+		'params' =>	['D','I','L','S','RH_LH'],
+		'type' => 'UF_USER_SECTION',
+	], // Свёрла и зенкеры
+	'7255' => [
+		'params' =>	['D','I','L','S','R','Z','CUTTING_TYPE'],
+		'type' => 'UF_USER_SECTION',
+	], // Фрезы со сменными ножами
+	'7268' => [
+		'params' =>	['D','I','L','S','RN','R','Z'],
+		'type' => 'UF_USER_SECTION',
+	], // Фрезы спиральные
+	'7370' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Столы, верстаки, тиски
+	'7373' => [
+		'params' =>	['NAME_PDF'],
+		'type' => 'UF_USER_SECTION',
+	], // Струбцины
 ];
 
-if (intval($_REQUEST['id'])) {
-	$arFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "ID" => intval($_REQUEST['id'])];
-	$arSelect = ["ID", "IBLOCK_ID", "NAME", "IBLOCK_SECTION_ID", "DETAIL_PICTURE", "PROPERTY_*"];
-	$res = CIBlockElement::GetList([], $arFilter, false, false, $arSelect);
-	if ($ob = $res->GetNextElement()) {
-		$arFields = $ob->GetFields();
-		$arProps = $ob->GetProperties();
-		
-		$name = $arFields['NAME'];
-		if ($arProps['NAME_PDF']['VALUE'])
-			$name = $arProps['NAME_PDF']['VALUE'];
-		
-		$make = '';
-		$resMake = CIBlockElement::GetByID($arProps["MAKE"]["VALUE"]);
-		if($arMake = $resMake->GetNext()) {
-			$make = $arMake["NAME"];
-		}
-		
-		$youtubeVideoIds = explode(',', $arProps['YOUTUBE_VIDEO_ID']['VALUE']);
-		$videoId = $youtubeVideoIds[0];
+// Properties
+$properties = [];
+$resProperty = CIBlockProperty::GetList([], ["IBLOCK_ID" => CATALOG_BLOCK_ID]);
+while ($obProperty = $resProperty->Fetch()) {
+	$properties[$obProperty['CODE']] = $obProperty['NAME'];
+}
 
-		if (!empty($arProps['YOUTUBE_VIDEO_ID']['VALUE']) && !file_exists($_SERVER['DOCUMENT_ROOT'] . '/upload/qrcode/qrcode-' . $arFields['ID'] . '.png')) {
-			QRcode::png(YOUTUBE_VIDEO_PATH . $videoId, $_SERVER['DOCUMENT_ROOT'] . '/upload/qrcode/qrcode-' . $arFields['ID'] . '.png', "L", 3, 3);
-		}
+//echo '<pre>';print_r($properties);echo '</pre>';
+//exit;
+
+$arResult = [];
+
+// Sections
+$arSectionFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "ACTIVE" => "Y", /*"UF_SEO_SECTION" => 0, "UF_USER_SECTION" => 0, "UF_USER_EXT_SECTION" => 1,*/ "DEPTH_LEVEL" => 2, "SECTION_ID" => $sections];
+$arSectionSelect = ["ID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PICTURE", "UF_*"];
+$arSectionOrder = ["SORT" => "ASC"];
+$resSection = CIBlockSection::GetList($arSectionOrder, $arSectionFilter, false, $arSectionSelect);
+while ($obSection = $resSection->GetNextElement()) {
+	$arSectionFields = $obSection->GetFields();
+	
+	if (!array_key_exists($arSectionFields['IBLOCK_SECTION_ID'], $sectionParams)) continue;
+	if (!$arSectionFields['UF_USER_SECTION'] && !$arSectionFields['UF_USER_EXT_SECTION']) continue;
+	
+	$arResult['SECTIONS'][$arSectionFields['ID']]['NAME'] = $arSectionFields['NAME'];
+	$arResult['SECTIONS'][$arSectionFields['ID']]['IBLOCK_SECTION_ID'] = $arSectionFields['IBLOCK_SECTION_ID'];
+	$arResult['SECTIONS'][$arSectionFields['ID']]['PICTURE'] = $arSectionFields['PICTURE'];
+	$arResult['SECTIONS'][$arSectionFields['ID']]['SRC'] = CFile::GetPath($arSectionFields['PICTURE']);
+	$arResult['SECTIONS'][$arSectionFields['ID']]['DESCRIPTION'] = $arSectionFields['DESCRIPTION'];
+	
+	// Elements
+	$arElementFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "SECTION_ID" => $arSectionFields['ID'], "PROPERTY_MAKE" => $makes];
+	$arElementSelect = ["ID", "IBLOCK_ID", "NAME", "IBLOCK_SECTION_ID", "DETAIL_PICTURE", "PROPERTY_*"];
+	$resElement = CIBlockElement::GetList([], $arElementFilter, false, false, $arElementSelect);
+	while ($obElement = $resElement->GetNextElement()) {
+		$arElementFields = $obElement->GetFields();
+		$arElementProps = $obElement->GetProperties();
 		
-		//echo '<pre>';print_r($arFields);echo '</pre>';
-		//echo '<pre>';print_r($arProps['MATERIAL']);echo '</pre>';
-		//exit;
+		$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS'][$arElementFields["ID"]]["FIELDS"] = $arElementFields;
+		$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS'][$arElementFields["ID"]]["PROPS"] = $arElementProps;
+		$arResult['SECTIONS'][$arSectionFields['ID']]['MAKES'][] = $arElementProps["MAKE"]["VALUE"];
+		$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS_CNT']++;
 		
-		$resSection = CIBlockSection::GetByID($arFields['IBLOCK_SECTION_ID']);
-		$arSection = $resSection->GetNext();
-		
-		$resParentSection = CIBlockSection::GetByID($arSection['IBLOCK_SECTION_ID']);
-		$arParentSection = $resParentSection->GetNext();
-		
-		if (!empty($arParentSection['NAME']))
-			$arSection['NAME'] = $arParentSection['NAME'];
-		
-		$price = 0;
-		$resPrice = CPrice::GetList([], ["PRODUCT_ID" => $arFields['ID'], "CATALOG_GROUP_ID" => 1]);
+		// Price
+		$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS'][$arElementFields["ID"]]["PRICE"] = '-';
+		$resPrice = CPrice::GetList([], ["PRODUCT_ID" => $arElementFields['ID'], "CATALOG_GROUP_ID" => 1]);
 		if ($arrPrice = $resPrice->Fetch()) {
-			$price = $arrPrice['PRICE'];
+			$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS'][$arElementFields["ID"]]["PRICE"] = $arrPrice['PRICE'];
 		}
 	}
+	$arResult['SECTIONS'][$arSectionFields['ID']]['MAKES'] = array_unique($arResult['SECTIONS'][$arSectionFields['ID']]['MAKES']);
 	
-	if (!empty($arFields)) {
+	if (!$arResult['SECTIONS'][$arSectionFields['ID']]['ELEMENTS_CNT']) unset($arResult['SECTIONS'][$arSectionFields['ID']]);
+}
+
+// Makes
+$makes = [];
+$arFilter = ["IBLOCK_ID" => MAKE_BLOCK_ID, "ACTIVE" => "Y"];
+$arSelect = ["ID", "IBLOCK_ID", "NAME", "DETAIL_PICTURE"];
+$arOrder = ["SORT" => "ASC"];
+$res = CIBlockElement::GetList($arOrder, $arFilter, false, false, $arSelect);
+while ($ob = $res->GetNextElement()) {
+	$arFields = $ob->GetFields();
+	
+	$arResult['MAKES'][$arFields['ID']]['NAME'] = $arFields['NAME'];
+	$arResult['MAKES'][$arFields['ID']]['DETAIL_PICTURE'] = $arFields['DETAIL_PICTURE'];
+	$arResult['MAKES'][$arFields['ID']]['SRC'] = CFile::GetPath($arFields['DETAIL_PICTURE']);
+}
+
+//echo '<pre>';print_r($arResult);echo '</pre>';
+//echo count($arResult);
+//exit;
+
+$curDate = date('d M Y');
+
+$defaultConfig = (new Mpdf\Config\ConfigVariables())->getDefaults();
+$fontDirs = $defaultConfig['fontDir'];
+
+$defaultFontConfig = (new Mpdf\Config\FontVariables())->getDefaults();
+$fontData = $defaultFontConfig['fontdata'];
+
+$mpdf = new \Mpdf\Mpdf([
+	'fontDir' => array_merge($fontDirs, [
+		$_SERVER['DOCUMENT_ROOT'] . '/local/templates/tooldirect_copy/fonts',
+	]),
+	'fontdata' => [
+		'montserrat' => $fontData + [
+				'R' => 'Montserrat-Regular.ttf',
+				'B' => 'Montserrat-Bold.ttf',
+			]
+	],
+	'default_font' => 'montserrat'
+]);
+$mpdf->SetTitle('PDF-Catalog');
+$mpdf->SetAuthor('Tooldirect');
+
+$html = '
+<style>
+	@page {
+		margin: 20px;
+	}
+	page[size="A4"] {
+		width: 210mm;
+		height: 297mm;
+	}
+	body {
+		background-color: #fff;
+		font-family: "montserrat", sans-serif;
+		font-size: 10px;
+		font-weight: normal;
+		line-height: 12px;
+		color: #262626;
+	}
+	.logo {
+		width: 165px;
+	}
+	.logo-img {
+		width: 48px;
+		height: 40px;
+	}
+	h1 {
+		font-size: 16px;
+		font-weight: bold;
+		color: #00AC25;
+		text-transform: uppercase;
+		line-height: 24px;
+	}
+	page {
+		display: block;
+		margin: 0 auto;
+		size: 210mm 297mm;
+	}
+	.small {
+		font-size: 8px;
+		line-height: 12px;
+	}
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+		border: 0;
+		width: 100%;
+	}
+	table td {
+		padding: 0;
+		vertical-align: top;
+	}
+	.section-img {
+		width: 96px;
+		height: 96px;
+	}
+	.make-logo {
+		width: 48px;
+		height: 24px;
+	}
+	.elements {
+		width: 100%;
+	}
+	.elements tr td {
+		width: 25px;
+		padding: 7px 0;
+		border-bottom: 1px solid #DFF5E4;
+	}
+	.bold {
+		font-weight: bold;
+	}
+	.price {
+		color: #00AC25;
+	}
+</style>';
+
+$html .= '<page size="A4">';
+if (!empty($arResult['SECTIONS'])) {
+	$i = 1;
+	foreach ($arResult['SECTIONS'] as $sectionKey => $sectionValue) {
+		$html .= '
+			<table class="header">
+				<tr>
+					<td>
+						<img src="' . $sectionValue['SRC'] . '" class="section-img">
+						<br>
+						<div>
+							<span>' . $curDate . '</span>
+						</div>
+					</td>
+					<td>
+						<br>
+						<h1><span style="color: #262626;">' . $i . '</span> ' . $sectionValue['NAME'] . '</h1>
+						<br>
+						<div>
+							' . $sectionValue['DESCRIPTION'] . '
+						</div>
+						<br>
+						<div>';
+		if (!empty($sectionValue['MAKES'])) {
+			foreach ($sectionValue['MAKES'] as $makeValue) {
+				$html .= '<img src="' . $arResult['MAKES'][$makeValue]['SRC'] . '" class="make-logo">';
+			}
+		}
+		$html .= '
+						</div>
+					</td>
+					<td>
+						<img src="/local/templates/tooldirect_copy/images/logo-pdf.png" alt="" class="img-logo">
+					</td>
+				</tr>
+			</table>';
 		
-		$html = '
-	<style>
-		@page {
-			margin: 0;
-		}
-		page[size="A4"] {
-			width: 210mm;
-			height: 297mm;
-		}
-		body {
-			background-color: #fff;
-			font-family: "montserrat", sans-serif;
-			font-size: 16px;
-			font-weight: normal;
-			line-height: 21px;
-			color: #666666;
-		}
-		.logo {
-			width: 165px;
-		}
-		.logo-img {
-			width: 130px;
-		}
-		h1 {
-			font-size: 32px;
-			font-weight: bold;
-			color: #00AC25;
-			text-transform: uppercase;
-			line-height: 31px;
-		}
-		h2 {
-			font-size: 20px;
-			font-weight: normal;
-			color: #262626;
-			line-height: 31px;
-		}
-		page {
-			display: block;
-			margin: 0 auto;
-			size: 210mm 297mm;
-		}
-		.small {
-			margin-top: 6px;
-			font-size: 14px;
-			line-height: 18px;
-		}
-		.extra-small {
-			font-size: 10px;
-			line-height: 14px;
-		}
-		.gray {
-			color: #757575;
-		}
-		table {
-			border-spacing: 0;
-			border-collapse: collapse;
-			border: 0;
-			width: 100%;
-		}
-		table td {
-			padding: 0;
-			vertical-align: top;
-		}
-		table.header {
-			background: #DFF5E4;
-		}
-		table.header td {
-			padding: 40px;
-		}
-		.border {
-			border: 1px solid #DFF5E4;
-		}
-		.img-logo {
-			width: 110px;
-		}
-		.line {
-			width: 100%;
-			height: 1px;
-			margin: 20px 0 5px;
-			background-color: #50287D;
-		}
-	</style>
-	<page size="A4">
-		<table class="header">
-			<tr>
-				<td>
-					<br>
-					<h1>' . $arSection['NAME'] . '</h1>
-					<br>
-					<h2>' . $name . '</h2>
-				</td>
-				<td>
-					<img src="' . SITE_TEMPLATE_PATH . '/images/logo-pdf.png" alt="" class="img-logo">
-				</td>
-			</tr>
-		</table>
-		<table style="width: 90%;margin: 0 auto;">
-			<tr>
-				<td class="border" style="padding-right: 0;width: 341px;">';
-		if (!empty($arFields['DETAIL_PICTURE'])) {
-			$resizeFile = CFile::ResizeImageGet($arFields['DETAIL_PICTURE'], ['width' => 338, 'height' => '338'], BX_RESIZE_IMAGE_EXACT, true, arWaterMark);
-			$html .= '<img src="' . $resizeFile['src'] . '" width="' . $resizeFile['width'] . '" height="' . $resizeFile['height'] . '">';
-		}
-		else {
-			$html .= '<img src="' . SITE_TEMPLATE_PATH . '/images/no_photo.png" width="338" height="338">';
-		}
-		$html .= '
-				</td>
-				<td style="width: 12px;"></td>
-				<td style="padding-left: 0;width: 352px;">';
-		if (!empty($arProps['MORE_PHOTO']['VALUE'])) {
-			$i = 1;
-			foreach ($arProps['MORE_PHOTO']['VALUE'] as $k => $v) {
-				$resizeFile = CFile::ResizeImageGet($v, ['width' => 112, 'height' => '111'], BX_RESIZE_IMAGE_EXACT, true, arWaterMark);
-				if ($i == 1) {
-					$img_style = "margin: 0 10px 0 0;";
-				}
-				else if ($i == 2) {
-					$img_style = "margin: 0 10px 0 0;";
-				}
-				else if ($i == 3) {
-					$img_style = "margin: 0 0 0 0;";
-				}
-				else if ($i == 4) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 5) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 6) {
-					$img_style = "margin: 10px 0 0 0;";
-				}
-				else if ($i == 7) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 8) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 9) {
-					$img_style = "margin: 10px 0 0 0;";
-				}
-				$html .= '<img src="' . $resizeFile['src'] . '" width="' . $resizeFile['width'] . '" height="' . $resizeFile['height'] . '" style="' . $img_style . '">';
-				$i++;
-				if ($i == 10) break;
-			}
-		}
-		if (!empty($arProps['DRAWING']['VALUE'])) {
-			foreach ($arProps['DRAWING']['VALUE'] as $k => $v) {
-				if ($i == 10) break;
-				$resizeFile = CFile::ResizeImageGet($v, ['width' => 109, 'height' => '108'], BX_RESIZE_IMAGE_EXACT, true, arWaterMark);
-				if ($i == 1) {
-					$img_style = "margin: 0 10px 0 0;";
-				}
-				else if ($i == 2) {
-					$img_style = "margin: 0 10px 0 0;";
-				}
-				else if ($i == 3) {
-					$img_style = "margin: 0 0 0 0;";
-				}
-				else if ($i == 4) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 5) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 6) {
-					$img_style = "margin: 10px 0 0 0;";
-				}
-				else if ($i == 7) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 8) {
-					$img_style = "margin: 10px 10px 0 0;";
-				}
-				else if ($i == 9) {
-					$img_style = "margin: 10px 0 0 0;";
-				}
-				$html .= '<img src="' . $resizeFile['src'] . '" width="' . $resizeFile['width'] . '" height="' . $resizeFile['height'] . '" style="' . $img_style . '">';
-				if ($i == 9) break;
-				$i++;
-			}
-		}
-		$html .= '
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3" style="height: 12px;"></td>
-			</tr>
-			<tr>
-				<td class="border">';
-					if ($videoId) {
+		switch ($type) {
+			case 'standart':
+				$firstColumnElementsCount = round($sectionValue['ELEMENTS_CNT'] / 2);
+				$secondColumnElementsCount = $sectionValue['ELEMENTS_CNT'] - $firstColumnElementsCount;
+				
+				//$html .= $sectionValue['ELEMENTS_CNT'].' - '.$firstColumnElementsCount . ' - ' . $secondColumnElementsCount;
+				
+				$html .= '<table><tr><td style="width: 49%;">';
+				
+				if ($firstColumnElementsCount) {
+					$html .= '<table class="elements">';
+					if (!empty($sectionValue['ELEMENTS'])) {
 						$html .= '
-						<table>
-							<tr>
-								<td>
-									<img src="/upload/qrcode/qrcode-' . $arFields['ID'] . '.png">
-								</td>
-								<td style="vertical-align: middle;">
-									<table>
-										<tr>
-											<td style="height: 25px;font-size: 12px;color: #262626;line-height: 1.4em;">
-												Сняли товар на видео
-											</td>
-										</tr>
-										<tr>
-											<td style="font-size: 10px;color: #262626;line-height: 1.4em;">
-												Просканируйте QR-код своим телефоном, чтобы увидеть короткое видео с товаром
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-						</table>';
+					<tr>
+						<td class="bold">Артикул</td>
+					';
+						foreach ($sectionParams[$sectionValue["IBLOCK_SECTION_ID"]]['params'] as $param) {
+							$html .= '<td class="bold">';
+							if (in_array($param, ['CUTTING_TYPE','RH_LH','TEETH_TYPE','RN','LENGTH','WIDTH','HEIGHT'])) {
+								$html .= $properties[$param];
+							} else {
+								$html .= $param;
+							}
+							$html .= '</td>';
+						}
+						$html .= '
+						<td class="bold">Цена</td>
+					</tr>';
+						$j = 1;
+						foreach ($sectionValue['ELEMENTS'] as $elementKey => $elementValue) {
+							$html .= '
+						<tr>
+							<td>' . $elementValue['PROPS']['ARTICLE']['VALUE'] . '</td>
+						';
+							foreach ($sectionParams[$sectionValue["IBLOCK_SECTION_ID"]]['params'] as $param) {
+								$html .= '<td>';
+								if ($elementValue['PROPS'][$param]['VALUE']) {
+									$html .= $elementValue['PROPS'][$param]['VALUE'];
+								} else {
+									$html .= '-';
+								}
+								$html .= '</td>';
+							}
+							$html .= '
+							<td><span class="price">' . number_format($elementValue['PRICE'], 0, '.', '&nbsp;') . '&nbsp;<span>&#8381;</span></span></td>
+						</tr>';
+							$j++;
+							if ($j > $firstColumnElementsCount) break;
+						}
 					}
-					$html .= '
-				</td>
-				<td style="width: 12px;"></td>
-				<td class="border" bgcolor="#DFF5E4" style="padding: 5px 0 0 2px;">
-					<table>
+					$html .= '</table>';
+				}
+				
+				$html .= '</td>';
+				$html .= '<td style="width: 2%;"></td>';
+				$html .= '<td style="width: 49%;">';
+				
+				if ($secondColumnElementsCount) {
+					$html .= '<table class="elements">';
+					if (!empty($sectionValue['ELEMENTS'])) {
+						$html .= '
+					<tr>
+						<td class="bold">Артикул</td>
+					';
+						foreach ($sectionParams[$sectionValue["IBLOCK_SECTION_ID"]]['params'] as $param) {
+							$html .= '<td class="bold">';
+							if (in_array($param, ['CUTTING_TYPE','RH_LH','TEETH_TYPE','RN','LENGTH','WIDTH','HEIGHT'])) {
+								$html .= $properties[$param];
+							} else {
+								$html .= $param;
+							}
+							$html .= '</td>';
+						}
+						$html .= '
+						<td class="bold">Цена</td>
+					</tr>';
+						$j = 1;
+						foreach ($sectionValue['ELEMENTS'] as $elementKey => $elementValue) {
+							if ($j <= $firstColumnElementsCount) {
+								$j++;
+								continue;
+							}
+							$html .= '
 						<tr>
-							<td style="padding: 5px 10px 3px 15px;width: 50%;"><h1>';
-		$html .= number_format($price, 0, '.', ' ') . '&nbsp;<span>&#8381;</span>';
-		$html .= '
-							</h1></td>
-							<td rowspan="2" style="padding: 5px 10px 10px 15px;vertical-align: middle;color: #262626;font-size: 10px;line-height: 1.4em;">
-								Актуальную цену товара уточняйте на сайте<br>при оформлении заказа
-							</td>
-						</tr>
-						<tr>
-							<td style="padding: 0 20px 10px 15px;color: #262626;font-size: 10px;line-height: 1.4em;">
-								Цена указана<br>за единицу товара
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td style="padding-top: 15px;">';
-		if (!empty($arProps)) {
-			foreach ($arProps as $code => $property) {
-				if (empty($property['VALUE'])) continue;
-				if (in_array($code, $disabledProps)) continue;
-				if ($code == 'MAKE')
-					$property['VALUE'] = $make;
-				$html .= '<div style="font-size: 12px;"><br>
-						<span>' . $property['NAME'] . ':</span> ';
-				if (is_array($property['VALUE']))
-					$html .= '<span style="font-weight: bold;color: #262626;">' . implode(' / ', $property['VALUE']) . '</span>';
-				else
-					$html .= '<span style="font-weight: bold;color: #262626;">' . strip_tags($property['VALUE']) . '</span>';
-				$html .= '</div>';
-			}
+							<td>' . $elementValue['PROPS']['ARTICLE']['VALUE'] . '</td>
+						';
+							foreach ($sectionParams[$sectionValue["IBLOCK_SECTION_ID"]]['params'] as $param) {
+								$html .= '<td>';
+								if ($elementValue['PROPS'][$param]['VALUE']) {
+									$html .= $elementValue['PROPS'][$param]['VALUE'];
+								} else {
+									$html .= '-';
+								}
+								$html .= '</td>';
+							}
+							$html .= '
+							<td><span class="price">' . number_format($elementValue['PRICE'], 0, '.', '&nbsp;') . '&nbsp;<span>&#8381;</span></span></td>
+						</tr>';
+						}
+					}
+					$html .= '</table>';
+				}
+				
+				$html .= '</td></tr></table>';
+			break;
+			case 'extended':
+			break;
+			default:
 		}
 		
-		$html .= '</td><td></td><td style="padding-top: 15px;">';
-		if (!empty($arProps['MATERIAL']['VALUE'])) {
-			$html .= '<div style="font-size: 12px;"><br>
-					<span>' . $arProps['MATERIAL']['NAME'] . ':</span><br>';
-			$html .= '<span style="font-weight: bold;color: #262626;">' . implode(' / ', $arProps['MATERIAL']['VALUE']) . '</span>';
-			$html .= '</div>';
-		}
-		$html .= '</td>
-			</tr>
-		</table>';
-		
-		$html .= '</page>';
-		
-		$defaultConfig = (new Mpdf\Config\ConfigVariables())->getDefaults();
-		$fontDirs = $defaultConfig['fontDir'];
-		
-		$defaultFontConfig = (new Mpdf\Config\FontVariables())->getDefaults();
-		$fontData = $defaultFontConfig['fontdata'];
-		
-		$mpdf = new \Mpdf\Mpdf([
-			'fontDir' => array_merge($fontDirs, [
-				$_SERVER['DOCUMENT_ROOT'] . '/local/templates/tooldirect_copy/fonts',
-			]),
-			'fontdata' => [
-				'montserrat' => $fontData + [
-						'R' => 'Montserrat-Regular.ttf',
-						'B' => 'Montserrat-Bold.ttf',
-					]
-			],
-			'default_font' => 'montserrat'
-		]);
-		$mpdf->SetTitle('PDF: ' . $arFields['NAME']);
-		$mpdf->SetAuthor('Tooldirect');
-		$footer = '
-		<table style="margin: 0 40px;width: 100%;">
-			<tr>
-				<td colspan="2"><hr style="color: #DFF5E4;"></td>
-			</tr>
-			<tr>
-				<td>
-					<span style="font-size:8px;color: #262626;">' . $arFields['NAME'] . '</span>
-				</td>
-				<td nowrap style="text-align: right;">
-					<span style="font-size: 9px;color: #00AC25">tooldirect.ru</span>
-				</td>
-			</tr>
-		</table>
-	';
-		$mpdf->WriteHTML($html);
-		$mpdf->setHtmlFooter($footer);
-		//$mpdf->Output();
-		$mpdf->Output($arSection['NAME'] . ' ' . $arProps['ARTICLE']['VALUE'] . '.pdf', 'I');
+		$i++;
 	}
 }
+$html .= '</page>';
+
+$footer = '
+	<table style="margin: 0 40px;width: 100%;">
+		<tr>
+			<td colspan="2"><hr style="color: #DFF5E4;"></td>
+		</tr>
+		<tr>
+			<td>
+				<span style="font-size:8px;color: #262626;">11111</span>
+			</td>
+			<td nowrap style="text-align: right;">
+				<span style="font-size: 9px;color: #00AC25">tooldirect.ru</span>
+			</td>
+		</tr>
+	</table>
+';
+$mpdf->WriteHTML($html);
+$mpdf->setHtmlFooter($footer);
+//$mpdf->Output();
+$mpdf->Output('Tooldirect PDF-Catalog.pdf', 'I');
 ?>
