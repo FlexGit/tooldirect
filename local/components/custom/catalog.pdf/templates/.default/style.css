@@ -8,8 +8,84 @@
 	margin-bottom: 20px;
 }
 #pdf_catalog_params a.product__menu-button {
+	width: 270px;
 	text-align: center;
+	background-color: #aaa;
+}
+#pdf_catalog_params a.product__menu-button.active {
+	background-color: #3caa37;
 }
 #pdf_catalog_params a.product__menu-button span {
 	color: #fff;
+}
+#pdf_catalog_params .pdf-catalog-email-container {
+	max-width: 420px;
+	display: flex;
+	-webkit-box-flex: 2;
+	-ms-flex: 2;
+	flex: 2;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+#pdf_catalog_params .form-group {
+	margin-bottom: 3px;
+}
+.pdf-catalog-description {
+	color: #a1a1a1;
+	font: 400 12px/18px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.pdf-catalog-block-field {
+	min-width: 235px;
+	-webkit-box-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	margin-bottom: 15px;
+}
+
+.pdf-catalog-block-btn {
+	position: absolute;
+	left: 400px;
+	display: block;
+	margin-top: -28px;
+	padding: 0;
+	width: 8px;
+	height: 8px;
+	border: none;
+	border-right: 2px solid #8da3ad;
+	border-bottom: 2px solid #8da3ad;
+	border-radius: 0;
+	background-color: transparent;
+	content: "";
+	cursor: pointer;
+	-webkit-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+}
+
+.basket-coupon-alert {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-align: start;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	min-height: 0;
+	width: 100%;
+	font: 400 13px/14px "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	-ms-flex-wrap: nowrap;
+	flex-wrap: nowrap;
+	-webkit-box-align: start;
+	align-items: flex-start;
+	/*justify-content: space-between;*/
+}
+
+.basket-coupon-text {
+	position: relative;
+	display: block;
+	padding-left: 18px;
+	word-break: break-all;
+	word-break: break-word;
 }

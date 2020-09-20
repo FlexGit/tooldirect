@@ -642,6 +642,38 @@ $(function() {
 		navigator.geolocation.getCurrentPosition(success, error, options);
 	});
 
+	$(document).on('click', '.js-pdf-catalog', function(){
+		var $form = $(this).closest('form');
+		var sections = [];
+		var makes = [];
+		var type = 'standart';
+		$form.find(':input').each(function(){
+			//console.log($(this).val());
+			if($(this).is(':checked')) {
+				if($(this).hasClass('pdf-section')){
+					sections.push($(this).val());
+				}else if($(this).hasClass('pdf-make')) {
+					makes.push($(this).val());
+				}else if($(this).hasClass('pdf-type')) {
+					type = $(this).val();
+				}
+			}
+		});
+
+		if(!sections.length && !makes.length) {
+			alert('Выберите разделы или производителей для формирования PDF-каталога');
+			return;
+		}
+
+		var url = '/local/tools/pdf_catalog.php?sections=' + sections + '&makes=' + makes + '&type=' + type;
+		//console.log(url);
+
+		var win = window.open(url, '_blank');
+		if(win){
+			win.focus();
+		}
+	});
+
 	function sectionOutput() {
 		$('.section-preloader').removeClass('hidden');
 

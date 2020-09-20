@@ -355,6 +355,72 @@ $(function() {
 		});
 	});
 
+	$body.on('click', 'a[data-target="#authModal"]', function(){
+		$('#regModal').modal('hide');
+	});
+
+	$body.on('click', 'a[data-target="#regModal"]', function(){
+		$('#authModal').modal('hide');
+	});
+
+	$body.on('submit', '#authModalForm', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+
+		$this = $(this);
+
+		$('.alert').text('').addClass('hidden');
+
+		var data = $this.serialize();
+		$.ajax({
+			url: '/local/ajax/auth.php',
+			type: 'POST',
+			data: data,
+			cache: false,
+			async: true,
+			success: function(response){
+				//console.log(response);
+				var data = JSON.parse(response);
+				if (data.success === true) {
+					window.location.reload();
+				} else {
+					$('.alert-danger').html(data.msg).removeClass('hidden');
+				}
+			}
+		});
+	});
+
+	$body.on('submit', '#regModalForm', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+
+		$this = $(this);
+
+		$('.alert').text('').addClass('hidden');
+
+		var data = $this.serialize();
+		//console.log(data);
+		$.ajax({
+			url: '/local/ajax/reg.php',
+			type: 'POST',
+			data: data,
+			cache: false,
+			async: true,
+			success: function(response){
+				//console.log(response);
+				var data = JSON.parse(response);
+				if (data.success === true) {
+					$('.alert-success').html(data.msg).removeClass('hidden');
+					$('#regModalForm').find('input,textarea').each(function() {
+						$(this).val('');
+					});
+				} else {
+					$('.alert-danger').html(data.msg).removeClass('hidden');
+				}
+			}
+		});
+	});
+
 	$body.on('submit', '#toolOrderModalForm', function(e){
 		e.stopPropagation();
 		e.preventDefault();
@@ -734,19 +800,58 @@ $(function() {
 			}
 		});
 
-		if(!sections.length || !makes.length) {
-			alert('Выберите разделы и производителей для формирования PDF-каталога');
+		if(!sections.length && !makes.length) {
+			alert('Выберите разделы или производителей для формирования PDF-каталога');
 			return;
 		}
 
 		var url = '/local/tools/pdf_catalog.php?sections=' + sections + '&makes=' + makes + '&type=' + type;
-		console.log(url);
+		//console.log(url);
 
 		var win = window.open(url, '_blank');
 		if(win){
 			win.focus();
 		}
 	});
+
+	$(document).on('click', '.js-pdf-catalog-email-btn', function(){
+		var $alert = $('.pdf-catalog-email-alert');
+		var $email = $('.js-pdf-catalog-email');
+
+		if (!isEmail($email.val())) {
+			$alert.text('Укажите корректный E-mail');
+			return false;
+		}
+
+		$alert.text('');
+
+		/*$.ajax({
+			url: '/local/ajax/pdf_catalog_code.php',
+			type: 'POST',
+			dataType: 'json',
+			data: JSON.stringify({email: $email.val()}),
+			cache: false,
+			async: true,
+			success: function(response){
+				//console.log(response);
+				var data = JSON.parse(response);
+				//console.log(data.success);
+				if(data.success === true) {
+					$('.num_products').text(data.num);
+					$('.total_price').text(data.sum);
+				}
+			}*?
+		});*/
+	});
+
+	/*$(document).on('click', '.s-pdf-catalog-code-btn', function(){
+
+	});*/
+
+	function isEmail(email) {
+		var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+		return regex.test(email);
+	}
 
 	function sectionOutput() {
 		$('.section-preloader').removeClass('hidden');

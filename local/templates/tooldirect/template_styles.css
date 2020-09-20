@@ -317,6 +317,9 @@ textarea {
 .header__contact--basket:before {
   background: url(images/basket.svg) 9px 12px no-repeat;
 }
+.header__contact--user:before {
+  background: url(images/user.svg) 13px 10px no-repeat;
+}
 .header__contact-counter {
   display: block;
   position: absolute;

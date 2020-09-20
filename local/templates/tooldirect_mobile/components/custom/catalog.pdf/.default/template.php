@@ -36,32 +36,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="pdf-catalog-email-container">
-			<div class="pdf-catalog-block-field">
-				<div class="pdf-catalog-description">Укажите E-mail, на который будет отправлен код подтверждения, для получения доступа на скачивание PDF каталога:</div>
-				<div class="form">
-					<div class="form-group">
-						<input type="text" name="pdf-catalog-email" placeholder="E-mail" class="form-control js-pdf-catalog-email">
-						<span class="pdf-catalog-block-btn js-pdf-catalog-email-btn"></span>
-					</div>
-				</div>
-				<div class="pdf-catalog-email-alert text-danger"></div>
-			</div>
-			<div class="pdf-catalog-block-field">
-				<div class="pdf-catalog-description">Укажите код подтверждения, полученный в письме на указанный E-mail:</div>
-				<div class="form">
-					<div class="form-group">
-						<input type="text" name="pdf-catalog-code" placeholder="Код подтверждения" class="form-control">
-						<span class="pdf-catalog-block-btn js-pdf-catalog-code-btn"></span>
-					</div>
-					<div class="pdf-catalog-code-alert text-danger"></div>
-				</div>
-			</div>
-			<div class="pdf-catalog-block-field">
-				<a href="javascript:void(0);" class="product__menu-button <?/*js-pdf-catalog*/?>">
-					<span>Скачать PDF Каталог</span>
-				</a>
-			</div>
+		<div>
+			<a href="javascript:void(0);" class="product__menu-button js-pdf-catalog">
+				<span>PDF Каталог</span>
+			</a>
 		</div>
 	</form>
 </section>

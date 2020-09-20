@@ -12,15 +12,16 @@ $validParams = [
 	'I',
 	'L',
 	'S',
-	'B',
+	'CUTTING_TYPE',
+	'Z',
+	'MATERIAL',
+	'RATE',
+	/*'B',
 	'R',
 	'H',
-	'CUTTING_TYPE',
 	'K',
 	'P',
-	'Z',
 	'RN',
-	'MATERIAL',
 	'R2',
 	'Z_TYPE',
 	'RH_LH',
@@ -31,14 +32,13 @@ $validParams = [
 	'DIMENSIONS',
 	'B2',
 	'WEIGHT',
-	'RATE',
 	'D2',
 	'TYPE_TOOL',
 	'TEETH_TYPE',
 	'TEETH_ANGLE',
 	'COATING',
 	'F',
-	'SPREAD',
+	'SPREAD',*/
 ];
 
 $i = 0;
@@ -58,11 +58,12 @@ $arr[$i] = [
 	'Обрабатываемый материал',
 	'Частота вращения, об/мин',
 	'Стоимость',
-	'Наличие'
+	'Наличие'/*,
+	'Разделы'*/
 ];
 $i++;
 
-$arFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "ACTIVE" => "Y", "PROPERTY_MAKE" => [319], "ID" => 6767];
+$arFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "ACTIVE" => "Y", "PROPERTY_MAKE" => [319]/*, "ID" => 6767*/];
 $arSelect = ["ID", "IBLOCK_ID", "NAME", "DETAIL_TEXT", "DETAIL_PICTURE", "PROPERTY_*"];
 $res = CIBlockElement::GetList(["NAME" => "ASC"], $arFilter, false, false, $arSelect);
 while ($ob = $res->GetNextElement()) {
@@ -85,7 +86,7 @@ while ($ob = $res->GetNextElement()) {
 	
 	$arr[$i][] = (string)trim($arFields["NAME"]);
 	
-	$arFields["DETAIL_TEXT"] = htmlentities($arFields['DETAIL_TEXT'], null, 'UTF-8');
+	/*$arFields["DETAIL_TEXT"] = htmlentities($arFields['DETAIL_TEXT'], null, 'UTF-8');
 	$arFields["DETAIL_TEXT"] = str_replace("&nbsp;", " ", $arFields['DETAIL_TEXT']);
 	$arFields["DETAIL_TEXT"] = str_replace("&amp;", "", $arFields['DETAIL_TEXT']);
 	$arFields["DETAIL_TEXT"] = str_replace("&laquo;", "", $arFields['DETAIL_TEXT']);
@@ -93,15 +94,15 @@ while ($ob = $res->GetNextElement()) {
 	$arFields["DETAIL_TEXT"] = str_replace("amp;", "", $arFields['DETAIL_TEXT']);
 	$arFields["DETAIL_TEXT"] = str_replace("quot;", "\"", $arFields['DETAIL_TEXT']);
 	$arFields["DETAIL_TEXT"] = str_replace("laquo;", "", $arFields['DETAIL_TEXT']);
-	$arFields["DETAIL_TEXT"] = str_replace("raquo;", "", $arFields['DETAIL_TEXT']);
+	$arFields["DETAIL_TEXT"] = str_replace("raquo;", "", $arFields['DETAIL_TEXT']);*/
 
-	$arr[$i][] = (string)trim(strip_tags($arFields["DETAIL_TEXT"]));
+	$arr[$i][] = /*(string)trim(strip_tags($arFields["DETAIL_TEXT"]))*/'';
 	
 	$arr[$i][] = (string)'https://tooldirect.ru' . CFile::GetPath($arFields["DETAIL_PICTURE"]);
 	
 	foreach ($arProps as $k => $v) {
 		if (!in_array($k, $validParams)) continue;
-		if (empty($v["VALUE"])) continue;
+		//if (empty($v["VALUE"])) continue;
 		
 		if ($v["PROPERTY_TYPE"] == 'E') {
 			$resSub = CIBlockElement::GetByID($v["VALUE"]);
@@ -138,6 +139,29 @@ while ($ob = $res->GetNextElement()) {
 		$arr[$i][] = 'от 10 до 20';
 	elseif ($resProduct['QUANTITY'] > 20)
 		$arr[$i][] = 'от 20';
+	
+	// разделы
+	$sectionIds = [];
+	$resSectionIds = CIBlockElement::GetElementGroups($arFields["ID"]);
+	while ($arSectionIds = $resSectionIds->Fetch()) {
+		$sectionIds[] = $arSectionIds["ID"];
+	}
+	$sections = [];
+	if (count($sectionIds)) {
+		$arSectionFilter = ["IBLOCK_ID" => CATALOG_BLOCK_ID, "ACTIVE" => "Y", "UF_SEO_SECTION" => "0", "DEPTH_LEVEL" => 2, "ID" => $sectionIds];
+		$arSectionSelect = ["ID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME"];
+		$resSection = CIBlockSection::GetList([], $arSectionFilter, true, $arSectionSelect);
+		while ($obSection = $resSection->GetNextElement()) {
+			$arSectionFields = $obSection->GetFields();
+			$sections[] = $arSectionFields["NAME"];
+		}
+		$sections = array_unique($sections);
+		if (!empty($sections)) {
+			foreach ($sections as $section) {
+				$arr[$i][] = $section;
+			}
+		}
+	}
 	
 	$i++;
 }

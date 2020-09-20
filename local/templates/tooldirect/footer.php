@@ -161,6 +161,26 @@
 			"PATH" => SITE_DIR."include/counters.php"
 		)
 	);?>
+	<?$APPLICATION->IncludeComponent(
+		"bitrix:main.include",
+		"",
+		Array(
+			"AREA_FILE_SHOW" => "file",
+			"AREA_FILE_SUFFIX" => "inc",
+			"EDIT_TEMPLATE" => "",
+			"PATH" => SITE_DIR."include/modal/auth.php"
+		)
+	);?>
+	<?$APPLICATION->IncludeComponent(
+		"bitrix:main.include",
+		"",
+		Array(
+			"AREA_FILE_SHOW" => "file",
+			"AREA_FILE_SUFFIX" => "inc",
+			"EDIT_TEMPLATE" => "",
+			"PATH" => SITE_DIR."include/modal/reg.php"
+		)
+	);?>
 	<a href="javascript:void(0);" class="btn btn-dark btn-lg back-to-top" role="button"></a>
     <script src="<?=SITE_TEMPLATE_PATH?>/js/jquery-3.2.1.min.js"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/js/tooltipster.bundle.min.js"></script>

@@ -87,6 +87,7 @@
                     <span>+7 (495) 984-41-55</span>
                     <span>Пн-Пт: 9:00 — 19:00</span>
                 </a>
+				<a href="javascript:void(0)" data-toggle="modal" data-target="#authModal" class="header__contact header__contact--user"></a>
 				<?$APPLICATION->IncludeComponent("bitrix:sale.basket.basket.line","",Array(
 						"HIDE_ON_BASKET_PAGES" => "N",
 						"PATH_TO_BASKET" => SITE_DIR."personal/cart/",

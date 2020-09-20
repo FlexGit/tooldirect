@@ -161,6 +161,26 @@
 			"PATH" => SITE_DIR."include/counters.php"
 		)
 	);?>
+	<?$APPLICATION->IncludeComponent(
+		"bitrix:main.include",
+		"",
+		Array(
+			"AREA_FILE_SHOW" => "file",
+			"AREA_FILE_SUFFIX" => "inc",
+			"EDIT_TEMPLATE" => "",
+			"PATH" => SITE_DIR."include/modal/auth.php"
+		)
+	);?>
+	<?$APPLICATION->IncludeComponent(
+		"bitrix:main.include",
+		"",
+		Array(
+			"AREA_FILE_SHOW" => "file",
+			"AREA_FILE_SUFFIX" => "inc",
+			"EDIT_TEMPLATE" => "",
+			"PATH" => SITE_DIR."include/modal/reg.php"
+		)
+	);?>
 	<a href="javascript:void(0);" class="btn btn-dark btn-lg back-to-top" role="button"></a>
 	<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=eedee5e2-7f38-4efd-8c07-680bd00a559c" type="text/javascript"></script>
 	<script src="<?=SITE_TEMPLATE_PATH?>/js/jquery-3.2.1.min.js"></script>

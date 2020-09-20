@@ -18,6 +18,11 @@ $APPLICATION->SetTitle("Контакты");
 		<p><strong>Адрес:</strong> г. Москва, Иркутская ул. д11 к2</p>
 		<p><strong>Тел.:</strong> <a href="tel:+74959844155" style="color:#000;">+7(495) 984-41-55</a></p>
 		<p>Будние дни с 9.00-17.30</a></p>
+		<br>
+		<a href="/images/scheme.jpg" class="lightgallery">
+			<img src="/images/scheme.jpg" style="width: 700px;border:1px solid #3caa37;">
+		</a>
+		<br><br>
 		<div style="width: 100%;text-align: center;">
 			<h4 style="color: #333;margin: 20px 0;">Наши дилеры</h4>
 			<img src="/images/100-pil-logo.png" title="" alt="" style="border: 1px solid #3caa37;">
