@@ -3,13 +3,13 @@
 global $USER;
 
 // проверка reCaptcha
-$objRecaptcha = new Recaptcha();
+/*$objRecaptcha = new Recaptcha();
 $recaptcha_response = $objRecaptcha->verify($_POST["g-recaptcha-response"]);
 
 if (!$recaptcha_response->success || $recaptcha_response->score < 0.9) {
 	echo json_encode([]);
 	die();
-}
+}*/
 
 // авторизация
 if (!is_object($USER)) $USER = new CUser;

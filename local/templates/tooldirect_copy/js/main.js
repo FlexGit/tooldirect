@@ -372,6 +372,7 @@ $(function() {
 		$('.alert').text('').addClass('hidden');
 
 		var data = $this.serialize();
+		//console.log(data);
 		$.ajax({
 			url: '/local/ajax/auth.php',
 			type: 'POST',
@@ -379,12 +380,12 @@ $(function() {
 			cache: false,
 			async: true,
 			success: function(response){
-				//console.log(response);
+				console.log(response);
 				var data = JSON.parse(response);
-				if (data.success === true) {
+				if (data === true) {
 					window.location.reload();
 				} else {
-					$('.alert-danger').html(data.msg).removeClass('hidden');
+					$('.alert-danger').html(data.MESSAGE).removeClass('hidden');
 				}
 			}
 		});
